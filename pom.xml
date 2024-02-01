@@ -10,6 +10,7 @@
 
   <properties>
     <tickets.path>src/main/resources/tickets.json</tickets.path>
+    <main.class.path>com.stalevs.Main</main.class.path>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
     <lombok.version>1.18.30</lombok.version>
@@ -56,7 +57,7 @@
           <artifactId>exec-maven-plugin</artifactId>
           <version>${exec.maven.version}</version>
         <configuration>
-          <mainClass>com.stalevs.Main</mainClass>
+          <mainClass>${main.class.path}</mainClass>
         </configuration>
       </plugin>
       <plugin>
