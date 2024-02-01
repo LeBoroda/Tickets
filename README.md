@@ -1,2 +1,4 @@
 # Tickets
-Test project for parsing json file and manipulating data. Maven, Jackson, Lombok, spotbugs, checkstyle used.
+Тестовое задание по парснигу json файла и обработке полученных данных. 
+Использованы Maven, Jackson, Lombok, Spotbugs, Checkstyle.
+Для запуска из консоли ввести команду mvn exec:java
