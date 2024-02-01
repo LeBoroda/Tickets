@@ -11,10 +11,7 @@ import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class PlaneTicket {
@@ -53,6 +50,7 @@ public class PlaneTicket {
     for (TicketDTO ticket : tickets) {
       prices.add(ticket.getPrice());
     }
+    Collections.sort(prices);
     if (prices.size() % 2 != 0) {
       medianPrice = prices.get(prices.size() / 2);
     } else {
