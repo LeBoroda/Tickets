@@ -12,7 +12,9 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class PlaneTicket {
@@ -42,69 +44,87 @@ public class PlaneTicket {
     for (TicketDTO ticket : tickets) {
       averageFlightPrice += ticket.getPrice();
     }
-    return averageFlightPrice/tickets.size();
+    return averageFlightPrice / tickets.size();
   }
 
   private Long getMedianFlightPrice(List<TicketDTO> tickets) {
-    Long medianPrice = 0L;
+    Long medianPrice;
     List<Long> prices = new ArrayList<>();
-    for(TicketDTO ticket :tickets) {
+    for (TicketDTO ticket : tickets) {
       prices.add(ticket.getPrice());
     }
-    if(prices.size()%2!=0){
-      medianPrice = prices.get(prices.size()/2);
+    if (prices.size() % 2 != 0) {
+      medianPrice = prices.get(prices.size() / 2);
     } else {
-      medianPrice = (prices.get(prices.size()/2-1)+prices.get(prices.size()/2))/2;
+      medianPrice = (prices.get(prices.size() / 2 - 1) + prices.get(prices.size() / 2)) / 2;
     }
     return medianPrice;
   }
 
-  private List<TicketDTO> getTicketsByCarrier(List<TicketDTO> tickets, CarriersData carrier) {
-    return tickets.stream()
-        .filter(t->t.getCarrier().equals(carrier.getName()))
-        .collect(Collectors.toList());
+  public void getMinFlightTimeByCarrier(AirportsData departure, AirportsData destination) {
+    List<TicketDTO> flightsByRoute = getTicketsByRoute(departure, destination);
+    Map<CarriersData, Duration> minFlightTimes = new HashMap<>();
+    for (TicketDTO ticket : flightsByRoute) {
+      CarriersData carrier = CarriersData.valueOf(ticket.getCarrier());
+      Duration flightTime = getFlightTime(ticket);
+      if (!minFlightTimes.isEmpty()) {
+        if (minFlightTimes.get(carrier) != null) {
+          Duration registerdDuration = minFlightTimes.get(carrier);
+          if (registerdDuration.compareTo(flightTime) > 0) {
+            minFlightTimes.put(carrier, flightTime);
+          }
+        } else {
+          minFlightTimes.put(carrier, flightTime);
+        }
+      } else {
+        minFlightTimes.put(carrier, flightTime);
+      }
+    }
+    minFlightTimes.forEach((key, value) ->
+        System.out.printf("Минимальное время полета из города %s в город %s для перевозчика %s составляет %s.%n",
+            departure.getName(), destination.getName(), key.getName(), timeConverter(value)));
   }
 
-  public void printTicketData() {
-    List<TicketDTO> tickets = listOfTickets;
-    System.out.printf("Flight time is %s.%n",timeConverter(getFlightTime(tickets.get(1))));
+  public void getAverageAndMedianPriceDifference(AirportsData departure, AirportsData destination) {
+    System.out.printf("Для полета из города %s в город %s разница между средней ценой и медианой составляет %s рублей.%n",
+        departure.getName(), destination.getName(),
+        (getAverageFlightPrice(getTicketsByRoute(departure, destination)))
+            - getMedianFlightPrice(getTicketsByRoute(departure, destination)));
+  }
 
-  }
-  public void getAverageAndMedianPriceDifference(AirportsData departure, AirportsData destination){
-    System.out.printf("VVO-TLV average and median price diff is %s rub.%n",
-        (getAverageFlightPrice(getTicketsByRoute(departure, destination)))-
-            getMedianFlightPrice(getTicketsByRoute(departure, destination)));
-  }
   private Duration getFlightTime(TicketDTO ticket) {
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
     LocalDateTime departure = LocalDateTime.parse(getFlightDepartureString(ticket), formatter);
     LocalDateTime arrival = LocalDateTime.parse(getFlightArrivalString(ticket), formatter);
     return Duration.between(departure, arrival);
   }
+
   private String timeConverter(Duration duration) {
     long hours = duration.toMinutes() / 60;
     long minutes = duration.toMinutes() % 60;
-    return String.format("%02d:%02d:00", hours, minutes);
+    return String.format("%02d часов %02d минут", hours, minutes);
   }
-  private String getFlightDepartureString(TicketDTO ticket){
+
+  private String getFlightDepartureString(TicketDTO ticket) {
     String[] dayString = ticket.getDepartureDate().split("\\.");
     String[] timeString = ticket.getDepartureTime().split(":");
-    if(dayString[2].length()<3) {
-      dayString[2]=String.format("20%s",dayString[2]);
+    if (dayString[2].length() < 3) {
+      dayString[2] = String.format("20%s", dayString[2]);
     }
-    if(timeString[0].length()!=2){
-      timeString[0]=String.format("0%s", timeString[0]);
+    if (timeString[0].length() != 2) {
+      timeString[0] = String.format("0%s", timeString[0]);
     }
     return String.format("%s.%s.%s %s:%s", dayString[0], dayString[1], dayString[2], timeString[0], timeString[1]);
   }
-  private String getFlightArrivalString(TicketDTO ticket){
+
+  private String getFlightArrivalString(TicketDTO ticket) {
     String[] dayString = ticket.getArrivalDate().split("\\.");
     String[] timeString = ticket.getArrivalTime().split(":");
-    if(dayString[2].length()<3) {
-      dayString[2]=String.format("20%s",dayString[2]);
+    if (dayString[2].length() < 3) {
+      dayString[2] = String.format("20%s", dayString[2]);
     }
-    if(timeString[0].length()!=2){
-      timeString[0]=String.format("0%s", timeString[0]);
+    if (timeString[0].length() != 2) {
+      timeString[0] = String.format("0%s", timeString[0]);
     }
     return String.format("%s.%s.%s %s:%s", dayString[0], dayString[1], dayString[2], timeString[0], timeString[1]);
   }

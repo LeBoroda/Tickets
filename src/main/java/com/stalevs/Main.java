@@ -1,16 +1,15 @@
-package runner;
+package com.stalevs;
 
 import data.AirportsData;
 import tickets.PlaneTicket;
-import java.io.IOException;
 
 public class Main {
 
-  public static void main(String[] args) throws IOException {
+  public static void main(String[] args) {
 
     PlaneTicket planeTicket = new PlaneTicket();
 
-    planeTicket.printTicketData();
+    planeTicket.getMinFlightTimeByCarrier(AirportsData.VVO, AirportsData.TLV);
 
     planeTicket.getAverageAndMedianPriceDifference(AirportsData.VVO, AirportsData.TLV);
   }

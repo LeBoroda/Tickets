@@ -1,18 +1,12 @@
 
 package dto;
 
+import lombok.Getter;
 import java.util.List;
 
+@Getter
 public class TicketInfoDTO {
 
-    private List<TicketDTO> tickets;
-
-    public List<TicketDTO> getTickets() {
-        return tickets;
-    }
-
-    public void setTickets(List<TicketDTO> tickets) {
-        this.tickets = tickets;
-    }
+  private List<TicketDTO> tickets;
 
 }
